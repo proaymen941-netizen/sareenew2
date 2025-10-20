@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Storage</title>
+</head>
+<body>
+    <h1>تنظيف التخزين المحلي</h1>
+    <button onclick="clearAll()">مسح كل البيانات</button>
+    <div id="result"></div>
+    
+    <script>
+        function clearAll() {
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Clear IndexedDB
+            indexedDB.deleteDatabase('RestaurantDB');
+            
+            document.getElementById('result').innerHTML = '<p style="color: green;">تم مسح جميع البيانات بنجاح!</p>';
+            
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

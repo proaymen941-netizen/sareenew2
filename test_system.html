@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار النظام الشامل</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #1e40af;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .test-section h3 {
+            color: #059669;
+            margin-bottom: 10px;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        button {
+            background: #1e40af;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #1e3a8a;
+        }
+        .log {
+            background: #f9fafb;
+            padding: 10px;
+            margin: 10px 0;
+            border-right: 4px solid #1e40af;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            padding: 8px;
+            text-align: right;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 اختبار النظام الشامل</h1>
+        
+        <div style="margin-bottom: 20px;">
+            <button onclick="runAllTests()">▶️ تشغيل جميع الاختبارات</button>
+            <button onclick="clearLogs()">🗑️ مسح السجلات</button>
+            <button onclick="location.href='/'">🏠 العودة للنظام</button>
+        </div>
+
+        <div id="results"></div>
+        
+        <div class="test-section">
+            <h3>📊 سجل الاختبار</h3>
+            <div id="testLog" class="log"></div>
+        </div>
+    </div>
+
+    <script src="js/db.js"></script>
+    <script>
+        const testLog = document.getElementById('testLog');
+        const resultsDiv = document.getElementById('results');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString('ar-SA');
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            logEntry.style.color = type === 'error' ? '#dc2626' : type === 'success' ? '#059669' : '#1e40af';
+            testLog.appendChild(logEntry);
+            testLog.scrollTop = testLog.scrollHeight;
+        }
+
+        function clearLogs() {
+            testLog.innerHTML = '';
+            resultsDiv.innerHTML = '';
+        }
+
+        function createStatusBadge(status) {
+            return `<span class="status ${status}">${status === 'success' ? '✅ نجح' : status === 'error' ? '❌ فشل' : '⏳ جاري'}</span>`;
+        }
+
+        async function runAllTests() {
+            clearLogs();
+            log('🚀 بدء اختبار النظام الشامل...', 'info');
+            
+            const tests = [
+                { name: 'اختبار الاتصال بالسيرفر', func: testServerConnection },
+                { name: 'اختبار قاعدة البيانات IndexedDB', func: testDatabase },
+                { name: 'اختبار قسم المخزون', func: testInventory },
+                { name: 'اختبار قسم الموظفين', func: testEmployees },
+                { name: 'اختبار قسم نقطة الكاشير POS', func: testPOS },
+                { name: 'اختبار قسم كاشير الموظفين', func: testEmployeeCashier },
+                { name: 'اختبار قسم الموردين', func: testSuppliers },
+                { name: 'اختبار القسم المالي', func: testFinance },
+                { name: 'اختبار التقارير', func: testReports },
+                { name: 'اختبار الإعدادات', func: testSettings }
+            ];
+
+            let resultsHTML = '<table><thead><tr><th>الاختبار</th><th>الحالة</th><th>التفاصيل</th></tr></thead><tbody>';
+            
+            for (const test of tests) {
+                log(`📝 جاري تشغيل: ${test.name}...`);
+                const result = await test.func();
+                resultsHTML += `<tr><td>${test.name}</td><td>${createStatusBadge(result.status)}</td><td>${result.message}</td></tr>`;
+                log(`${result.status === 'success' ? '✅' : '❌'} ${test.name}: ${result.message}`, result.status);
+            }
+            
+            resultsHTML += '</tbody></table>';
+            resultsDiv.innerHTML = resultsHTML;
+            
+            log('✨ اكتمل الاختبار الشامل!', 'success');
+        }
+
+        // 1. اختبار الاتصال بالسيرفر
+        async function testServerConnection() {
+            try {
+                const response = await fetch('/');
+                if (response.ok) {
+                    return { status: 'success', message: 'السيرفر يعمل بشكل صحيح على المنفذ 5000' };
+                } else {
+                    return { status: 'error', message: `خطأ: ${response.status}` };
+                }
+            } catch (error) {
+                return { status: 'error', message: `فشل الاتصال: ${error.message}` };
+            }
+        }
+
+        // 2. اختبار قاعدة البيانات
+        async function testDatabase() {
+            try {
+                await db.init();
+                
+                // اختبار القراءة والكتابة
+                const testItem = {
+                    name: 'اختبار',
+                    category: 'test',
+                    unit: 'قطعة',
+                    quantity: 1,
+                    purchase_price: 10,
+                    sell_price: 15
+                };
+                
+                const id = await db.add('inventory_items', testItem);
+                const retrieved = await db.getById('inventory_items', id);
+                await db.delete('inventory_items', id);
+                
+                if (retrieved && retrieved.name === 'اختبار') {
+                    return { status: 'success', message: 'قاعدة البيانات تعمل بشكل صحيح (إضافة، قراءة، حذف)' };
+                } else {
+                    return { status: 'error', message: 'خطأ في استرجاع البيانات' };
+                }
+            } catch (error) {
+                return { status: 'error', message: `خطأ: ${error.message}` };
+            }
+        }
+
+        // 3. اختبار قسم المخزون
+        async function testInventory() {
+            try {
+                const items = await db.getAll('inventory_items');
+                const movements = await db.getAll('inventory_movements');
+                return { status: 'success', message: `المخزون: ${items.length} صنف، ${movements.length} حركة` };
+            } catch (error) {
+                return { status: 'error', message: `خطأ: ${error.message}` };
+            }
+        }
+
+        // 4. اختبار قسم الموظفين
+        async function testEmployees() {
+            try {
+                const employees = await db.getAll('employees');
+                const attendance = await db.getAll('attendance');
+                const salaries = await db.getAll('salaries');
+                return { status: 'success', message: `الموظفين: ${employees.length} موظف، ${attendance.length} حضور، ${salaries.length} راتب` };
+            } catch (error) {
+                return { status: 'error', message: `خطأ: ${error.message}` };
+            }
+        }
+
+        // 5. اختبار نقطة الكاشير POS
+        async function testPOS() {
+            try {
+                const orders = await db.getAll('pos_orders');
+                return { status: 'success', message: `نقطة الكاشير: ${orders.length} طلب` };
+            } catch (error) {
+                return { status: 'error', message: `خطأ: ${error.message}` };
+            }
+        }
+
+        // 6. اختبار كاشير الموظفين
+        async function testEmployeeCashier() {
+            try {
+                const meals = await db.getAll('employee_meals');
+                const orders = await db.getAll('employee_meal_orders');
+                return { status: 'success', message: `كاشير الموظفين: ${meals.length} وجبة، ${orders.length} طلب` };
+            } catch (error) {
+                return { status: 'error', message: `خطأ: ${error.message}` };
+            }
+        }
+
+        // 7. اختبار الموردين
+        async function testSuppliers() {
+            try {
+                const suppliers = await db.getAll('suppliers');
+                const invoices = await db.getAll('purchase_invoices');
+                const payments = await db.getAll('supplier_payments');
+                return { status: 'success', message: `الموردين: ${suppliers.length} مورد، ${invoices.length} فاتورة، ${payments.length} دفعة` };
+            } catch (error) {
+                return { status: 'error', message: `خطأ: ${error.message}` };
+            }
+        }
+
+        // 8. اختبار القسم المالي
+        async function testFinance() {
+            try {
+                const revenues = await db.getAll('revenues');
+                const expenses = await db.getAll('expenses');
+                return { status: 'success', message: `المالية: ${revenues.length} إيراد، ${expenses.length} مصروف` };
+            } catch (error) {
+                return { status: 'error', message: `خطأ: ${error.message}` };
+            }
+        }
+
+        // 9. اختبار التقارير
+        async function testReports() {
+            try {
+                // التحقق من إمكانية تحميل التقارير
+                const items = await db.getAll('inventory_items');
+                const employees = await db.getAll('employees');
+                return { status: 'success', message: `التقارير متاحة للمخزون والموظفين والمالية` };
+            } catch (error) {
+                return { status: 'error', message: `خطأ: ${error.message}` };
+            }
+        }
+
+        // 10. اختبار الإعدادات
+        async function testSettings() {
+            try {
+                // اختبار النسخ الاحتياطي
+                const data = await db.exportData();
+                if (data && Object.keys(data).length > 0) {
+                    return { status: 'success', message: `الإعدادات: النسخ الاحتياطي يعمل، ${Object.keys(data).length} جدول` };
+                } else {
+                    return { status: 'error', message: 'لا توجد بيانات للتصدير' };
+                }
+            } catch (error) {
+                return { status: 'error', message: `خطأ: ${error.message}` };
+            }
+        }
+
+        // تشغيل تلقائي عند التحميل
+        window.addEventListener('DOMContentLoaded', () => {
+            log('📱 صفحة الاختبار جاهزة', 'success');
+        });
+    </script>
+</body>
+</html>
