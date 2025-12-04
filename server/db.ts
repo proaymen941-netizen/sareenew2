@@ -1,12 +1,13 @@
 // @ts-nocheck
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { 
-  adminUsers, categories, restaurantSections, restaurants, 
-  menuItems, users, customers, userAddresses, orders, specialOffers, 
+import {
+  adminUsers, adminSessions, categories, restaurantSections, restaurants,
+  menuItems, users, customers, userAddresses, orders, specialOffers,
   notifications, ratings, systemSettingsTable as systemSettings, drivers, orderTracking,
   cart, favorites,
   type AdminUser, type InsertAdminUser,
+  type AdminSession, type InsertAdminSession,
   type Category, type InsertCategory,
   type Restaurant, type InsertRestaurant,
   type RestaurantSection, type InsertRestaurantSection,
@@ -46,6 +47,7 @@ function getDb() {
     // Pass schema to enable db.query functionality
     const schema = {
       adminUsers,
+      adminSessions,
       categories,
       restaurantSections,
       restaurants,
@@ -106,7 +108,28 @@ export class DatabaseStorage {
     return result[0];
   }
 
-  // تم حذف وظائف AdminSession - لم تعد مطلوبة بعد إزالة نظام المصادقة
+  async getAllAdminUsers(): Promise<AdminUser[]> {
+    const result = await this.db.select().from(adminUsers);
+    return Array.isArray(result) ? result : [];
+  }
+
+  // Admin Sessions - للمصادقة
+  async createAdminSession(session: InsertAdminSession): Promise<AdminSession> {
+    const [newSession] = await this.db.insert(adminSessions).values(session).returning();
+    return newSession;
+  }
+
+  async getAdminSession(token: string): Promise<AdminSession | undefined> {
+    const [session] = await this.db.select().from(adminSessions).where(
+      eq(adminSessions.token, token)
+    );
+    return session;
+  }
+
+  async deleteAdminSession(token: string): Promise<boolean> {
+    const result = await this.db.delete(adminSessions).where(eq(adminSessions.token, token));
+    return result.rowCount > 0;
+  }
 
   // Users
   async getUsers(): Promise<User[]> {

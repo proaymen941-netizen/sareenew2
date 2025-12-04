@@ -4,10 +4,23 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./viteServer";
 import { seedDefaultData } from "./seed";
 import { storage } from "./storage";
+import { initializeWebSocket } from "./websocket";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Enable CORS for WebSocket and API
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Disable ETag caching to fix special offers not updating
 app.set('etag', false);
@@ -52,6 +65,9 @@ app.use((req, res, next) => {
   try {
     const server = await registerRoutes(app);
 
+    // Initialize WebSocket
+    initializeWebSocket(server);
+
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
@@ -77,6 +93,7 @@ app.use((req, res, next) => {
       reusePort: true,
     }, () => {
       log(`serving on port ${port}`);
+      log(`🔌 WebSocket server ready at ws://localhost:${port}/ws`);
     });
   } catch (err) {
     console.error("Failed to start server:", err);

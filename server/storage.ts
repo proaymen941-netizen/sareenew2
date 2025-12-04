@@ -12,6 +12,7 @@ import {
   type Cart, type InsertCart,
   type Favorites, type InsertFavorites,
   type AdminUser, type InsertAdminUser,
+  type AdminSession, type InsertAdminSession,
   type Notification, type InsertNotification
 } from "../shared/schema";
 import { randomUUID } from "crypto";
@@ -102,12 +103,17 @@ export interface IStorage {
   removeFromFavorites(userId: string, restaurantId: string): Promise<boolean>;
   isRestaurantFavorite(userId: string, restaurantId: string): Promise<boolean>;
 
-  // Admin methods - بدون مصادقة
+  // Admin methods - مع مصادقة
   createAdminUser(adminUser: InsertAdminUser): Promise<AdminUser>;
   getAllAdminUsers(): Promise<AdminUser[]>;
   getAdminByEmail(emailOrUsername: string): Promise<AdminUser | undefined>;
   getAdminByPhone(phone: string): Promise<AdminUser | undefined>;
   getAdminById(id: string): Promise<AdminUser | undefined>;
+
+  // Admin Session methods - للمصادقة
+  createAdminSession(session: InsertAdminSession): Promise<AdminSession>;
+  getAdminSession(token: string): Promise<AdminSession | undefined>;
+  deleteAdminSession(token: string): Promise<boolean>;
 
   // Notification methods
    // getNotifications(recipientId?: string, type?: string): Promise<Notification[]>;
@@ -141,7 +147,7 @@ export class MemStorage implements IStorage {
   private cartItems: Map<string, Cart>;
   private favorites: Map<string, Favorites>;
   private adminUsers: Map<string, AdminUser>;
-  // تم حذف adminSessions - لا حاجة لها بعد إزالة نظام المصادقة
+  private adminSessions: Map<string, AdminSession>;
   private notifications: Map<string, Notification>;
   private orderTracking: Map<string, {id: string; orderId: string; status: string; message: string; createdBy: string; createdByType: string; createdAt: Date}>;
 
@@ -719,6 +725,10 @@ async updateRestaurant(id: string, restaurant: Partial<InsertRestaurant>): Promi
     if (!existing) return undefined;
     const updated = { ...existing, ...driver };
     this.drivers.set(id, updated);
+    
+    // إضافة log للتتبع
+    console.log(`🚗 تم تحديث السائق: ${updated.name} - متاح: ${updated.isAvailable}`);
+    
     return updated;
   }
 
@@ -1021,7 +1031,27 @@ async updateRestaurant(id: string, restaurant: Partial<InsertRestaurant>): Promi
     return this.adminUsers.get(id);
   }
 
-  // تم حذف جميع طرق إدارة الجلسات - لا حاجة لها بعد إزالة نظام المصادقة
+  // Admin Session methods - للمصادقة
+  private adminSessions: Map<string, AdminSession> = new Map();
+
+  async createAdminSession(session: InsertAdminSession): Promise<AdminSession> {
+    const id = randomUUID();
+    const newSession: AdminSession = {
+      ...session,
+      id,
+      createdAt: new Date(),
+    };
+    this.adminSessions.set(session.token, newSession);
+    return newSession;
+  }
+
+  async getAdminSession(token: string): Promise<AdminSession | undefined> {
+    return this.adminSessions.get(token);
+  }
+
+  async deleteAdminSession(token: string): Promise<boolean> {
+    return this.adminSessions.delete(token);
+  }
 
   // Notification methods
   async getNotifications(recipientType?: string, recipientId?: string, unread?: boolean): Promise<Notification[]> {

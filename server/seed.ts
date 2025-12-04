@@ -1,4 +1,5 @@
 import { dbStorage } from './db';
+import { UnifiedAuthService } from './auth';
 
 export async function seedDefaultData() {
   try {
@@ -268,22 +269,23 @@ export async function seedDefaultData() {
     }
 
     // Create default admin user
+    const authService = new UnifiedAuthService();
     const adminUsers = [
       {
         name: "مدير النظام الرئيسي",
         email: "admin@alsarie-one.com",
         username: "admin",
         phone: "+967777777777",
-        password: "777146387", // كلمة مرور غير مشفرة للاختبار
+        password: await authService.hashPassword("777146387"), // كلمة مرور مشفرة
         userType: "admin",
         isActive: true,
       },
       {
         name: "مدير فرعي",
-        email: "manager@alsarie-one.com", 
+        email: "manager@alsarie-one.com",
         username: "manager",
         phone: "+967777777778",
-        password: "manager123",
+        password: await authService.hashPassword("manager123"),
         userType: "admin",
         isActive: true,
       }
@@ -300,7 +302,7 @@ export async function seedDefaultData() {
       {
         name: "أحمد محمد السائق",
         phone: "+967771234567",
-        password: "123456",
+        password: await authService.hashPassword("123456"),
         isAvailable: true,
         isActive: true,
         currentLocation: "صنعاء، شارع الزبيري",
@@ -309,7 +311,7 @@ export async function seedDefaultData() {
       {
         name: "علي حسن السائق",
         phone: "+967779876543",
-        password: "123456",
+        password: await authService.hashPassword("123456"),
         isAvailable: true,
         isActive: true,
         currentLocation: "صنعاء، شارع السبعين",
