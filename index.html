@@ -1,104 +1,25 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة المطعم المتكامل</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div id="app">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="header-content">
-                <h1 class="app-title">نظام إدارة المطعم</h1>
-                <div class="header-actions">
-                    <button id="themeToggle" class="btn-icon" title="تبديل الوضع">
-                        🌙
-                    </button>
-                    <button id="backupBtn" class="btn-icon" title="النسخ الاحتياطي">
-                        💾
-                    </button>
-                    <button id="notificationsBtn" class="btn-icon" title="التنبيهات">
-                        🔔
-                        <span id="notificationBadge" class="badge hidden">0</span>
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Sidebar Navigation -->
-        <nav class="sidebar">
-            <div class="nav-menu">
-                <button class="nav-item active" data-module="dashboard">
-                    📊 لوحة التحكم
-                </button>
-                <button class="nav-item" data-module="inventory">
-                    📦 المخزون
-                </button>
-                <button class="nav-item" data-module="pos">
-                    🧾 كاشير الأقسام
-                </button>
-                <button class="nav-item" data-module="employees">
-                    👥 الموظفين
-                </button>
-                <button class="nav-item" data-module="employee_cashier">
-                    🍽️ كاشير الموظفين
-                </button>
-                <button class="nav-item" data-module="suppliers">
-                    🚚 الموردين
-                </button>
-                <button class="nav-item" data-module="finance">
-                    💰 المالية
-                </button>
-                <button class="nav-item" data-module="reports">
-                    📈 التقارير
-                </button>
-                <button class="nav-item" data-module="settings">
-                    ⚙️ الإعدادات
-                </button>
-            </div>
-        </nav>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <div id="content-area">
-                <!-- Dynamic content loaded here -->
-            </div>
-        </main>
-
-        <!-- Notification Panel -->
-        <div id="notificationPanel" class="notification-panel hidden">
-            <div class="panel-header">
-                <h3>التنبيهات</h3>
-                <button class="btn-close" onclick="closeNotifications()">×</button>
-            </div>
-            <div id="notificationList" class="notification-list">
-                <!-- Notifications will be loaded here -->
-            </div>
-        </div>
-
-        <!-- Modal Container -->
-        <div id="modalContainer"></div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="js/api.js"></script>
-    <script src="js/db_laravel.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/smartNotifications.js"></script>
-    <script src="js/modules/dashboard.js"></script>
-    <script src="js/modules/inventory.js"></script>
-    <script src="js/modules/pos.js"></script>
-    <script src="js/modules/employees.js"></script>
-    <script src="js/modules/employee_cashier.js"></script>
-    <script src="js/modules/suppliers.js"></script>
-    <script src="js/modules/finance.js"></script>
-    <script src="js/modules/reports.js"></script>
-    <script src="js/modules/settings.js"></script>
-    <script src="js/app.js"></script>
-</body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fira+Code:wght@300..700&family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Outfit:wght@100..900&family=Oxanium:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=Space+Grotesk:wght@300..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script
+      type="text/javascript"
+      src="https://replit.com/public/js/replit-dev-banner.js"
+    ></script>
+  </body>
 </html>
