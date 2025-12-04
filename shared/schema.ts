@@ -2,13 +2,14 @@ import { pgTable, text, uuid, timestamp, boolean, integer, decimal, varchar } fr
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Users table (customers) - بدون مصادقة
+// Users table (customers) - مع مصادقة
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   username: varchar("username", { length: 50 }).notNull().unique(),
   name: text("name").notNull(),
   phone: varchar("phone", { length: 20 }),
   email: varchar("email", { length: 100 }),
+  password: text("password").notNull(),
   address: text("address"),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -140,19 +141,28 @@ export const specialOffers = pgTable("special_offers", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Admin users table - بدون مصادقة
+// Admin users table - مع مصادقة
 export const adminUsers = pgTable("admin_users", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 100 }).notNull(),
   username: varchar("username", { length: 50 }).unique(),
   email: varchar("email", { length: 100 }).notNull().unique(),
   phone: varchar("phone", { length: 20 }),
+  password: text("password").notNull(),
   userType: varchar("user_type", { length: 50 }).default("admin").notNull(),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// تم حذف جدول admin_sessions - لا حاجة له بعد إزالة نظام المصادقة
+// Admin sessions table - للمصادقة
+export const adminSessions = pgTable("admin_sessions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  adminId: uuid("admin_id").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  userType: varchar("user_type", { length: 50 }).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 
 // System settings table
 export const systemSettings = pgTable("system_settings", {
@@ -215,7 +225,10 @@ export const selectAdminUserSchema = createSelectSchema(adminUsers);
 export type AdminUser = z.infer<typeof selectAdminUserSchema>;
 export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
 
-// تم حذف AdminSession schemas - لا حاجة لها بعد إزالة نظام المصادقة
+export const insertAdminSessionSchema = createInsertSchema(adminSessions);
+export const selectAdminSessionSchema = createSelectSchema(adminSessions);
+export type AdminSession = z.infer<typeof selectAdminSessionSchema>;
+export type InsertAdminSession = z.infer<typeof insertAdminSessionSchema>;
 
 // Restaurant sections table
 export const restaurantSections = pgTable("restaurant_sections", {
