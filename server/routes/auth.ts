@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import { dbStorage } from '../db';
-import { adminUsers, drivers } from '@shared/schema';
+import { adminUsers, drivers } from '../../shared/schema';
 import { eq, or } from 'drizzle-orm';
 
 const router = express.Router();

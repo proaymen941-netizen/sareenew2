@@ -22,7 +22,7 @@ import {
   type Driver, type InsertDriver,
   type Cart, type InsertCart,
   type Favorites, type InsertFavorites
-} from "@shared/schema";
+} from "../shared/schema";
 import { IStorage } from "./storage";
 import { eq, and, desc, sql, or, like, asc, inArray } from "drizzle-orm";
 

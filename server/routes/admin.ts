@@ -29,7 +29,7 @@ import {
   orderTracking,
   cart,
   favorites
-} from "@shared/schema";
+} from "../../shared/schema";
 import { DatabaseStorage } from "../db";
 
 const router = express.Router();

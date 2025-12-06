@@ -1,5 +1,5 @@
-import WebSocket, { Server as WebSocketServer } from 'ws';
-import { Server as HTTPServer } from 'http';
+import WebSocket, { WebSocketServer } from 'ws';
+import { Server as HTTPServer, IncomingMessage } from 'http';
 import { log } from './viteServer';
 
 export interface WebSocketClient {
@@ -24,7 +24,7 @@ export class WebSocketManager {
   }
 
   private initialize() {
-    this.wss.on('connection', (ws, req) => {
+    this.wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
       const clientId = this.generateClientId();
       const client: WebSocketClient = {
         id: clientId,
@@ -56,7 +56,7 @@ export class WebSocketManager {
         this.handleClientDisconnect(clientId);
       });
 
-      ws.on('error', (error) => {
+      ws.on('error', (error: Error) => {
         log(`❌ WebSocket error for client ${clientId}: ${error}`);
       });
 
@@ -125,7 +125,7 @@ export class WebSocketManager {
     }
   }
 
-  private updateDriverLocation(driverId: string, location: { lat: number; lng: number }) {
+  public updateDriverLocation(driverId: string, location: { lat: number; lng: number }) {
     this.driverLocations.set(driverId, location);
     
     this.broadcast({

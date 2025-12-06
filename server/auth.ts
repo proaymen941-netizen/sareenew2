@@ -7,7 +7,7 @@ import {
   type User,
   type Driver,
   type AdminUser
-} from '@shared/schema';
+} from '../shared/schema';
 
 // نوع المستخدم الموحد للمصادقة
 export interface AuthUser {

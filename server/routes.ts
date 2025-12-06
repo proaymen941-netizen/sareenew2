@@ -29,7 +29,7 @@ import {
   insertCartSchema,
   insertFavoritesSchema,
   orders
-} from "@shared/schema";
+} from "../shared/schema";
 import { randomUUID } from "crypto";
 import { eq, and, gte, lte, desc, isNull } from "drizzle-orm";
 import { z } from "zod";
