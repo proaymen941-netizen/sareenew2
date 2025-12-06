@@ -12,7 +12,7 @@
     "start": "NODE_ENV=production tsx server/index.ts",
     "build": "npm run build:client && npm run build:server",
     "build:client": "cd client && vite build",
-    "build:server": "tsc --project tsconfig.server.json",
+    "build:server": "tsc --project tsconfig.json",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
